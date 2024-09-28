@@ -1,5 +1,7 @@
 "use client";
 
+import { ModeToggle } from "@/components/mode-toggle";
+import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 // import { createDocument } from "@/convex/documetns";
 import { SignInButton, UserButton } from "@clerk/nextjs";
@@ -17,20 +19,22 @@ export default function Home() {
   );
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center">
+    <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <Unauthenticated>
         <SignInButton />
       </Unauthenticated>
       <Authenticated>
         <UserButton />
         {/* <Content /> */}
-        <button
+        <ModeToggle />
+
+        <Button
           onClick={() =>
             createDocument({ title: "New Document" })
           }
         >
           Create Document
-        </button>
+        </Button>
         {getDocuments?.map((document) => (
           <div key={document._id}>{document.title}</div>
         ))}
