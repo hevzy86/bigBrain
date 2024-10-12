@@ -11,6 +11,8 @@ import {
   useMutation,
   useQuery,
 } from "convex/react";
+import DocumentCard from "./_componenets/DocumentCard";
+import CreateDocumentButton from "./_componenets/CreateDocumentButton";
 
 export default function Home() {
   const getDocuments = useQuery(api.documents.getDocuments);
@@ -19,26 +21,21 @@ export default function Home() {
   );
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <Unauthenticated>
-        <SignInButton />
-      </Unauthenticated>
-      <Authenticated>
-        <UserButton />
-        {/* <Content /> */}
-        <ModeToggle />
+    <main className="p-24 space-y-8">
+      <div className="flex justify-between items-center ">
+        <h1 className="text-2xl font-bold">My Documents</h1>
+        <CreateDocumentButton/>
+         
+      </div>
 
-        <Button
-          onClick={() =>
-            createDocument({ title: "New Document" })
-          }
-        >
-          Create Document
-        </Button>
+      <div className="grid grid-cols-4 gap-8">
         {getDocuments?.map((document) => (
-          <div key={document._id}>{document.title}</div>
+          <DocumentCard
+            key={document._id}
+            document={document}
+          />
         ))}
-      </Authenticated>
+      </div>
     </main>
   );
 }
