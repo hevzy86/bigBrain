@@ -24,8 +24,7 @@ export default function Home() {
     <main className="p-24 space-y-8">
       <div className="flex justify-between items-center ">
         <h1 className="text-2xl font-bold">My Documents</h1>
-        <CreateDocumentButton/>
-         
+        <CreateDocumentButton />
       </div>
 
       <div className="grid grid-cols-4 gap-8">
@@ -36,6 +35,28 @@ export default function Home() {
           />
         ))}
       </div>
+
+
     </main>
   );
 }
+
+
+
+
+{/* {getDocuments?.map((doc) => (
+  <div key={doc._id}>{doc.title}</div>
+))} */}
+
+
+
+
+
+
+{/* <button
+  onClick={() => {
+    createDocument({ title: "hello world" });
+  }}
+>
+  Click Mer{" "}
+</button> */}
