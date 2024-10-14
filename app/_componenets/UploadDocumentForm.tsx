@@ -1,6 +1,4 @@
 "use client";
-
-import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
 import {
@@ -17,10 +15,10 @@ import { Input } from "@/components/ui/input";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { createDocument } from "@/convex/documents";
 import { useMutation } from "convex/react";
-
-//import { Form, useForm } from "react-hook-form"
+import { Loader2 } from "lucide-react";
+import { useState } from "react";
+import LoadingButton from "./LoadingButton";
 
 const formSchema = z.object({
   title: z.string().min(1).max(250),
@@ -32,13 +30,9 @@ export default function UploadDocumentForm({
 }: {
   onUpload: () => void;
 }) {
-  // const organization = useOrganization();
   const createDocument = useMutation(
     api.documents.createDocument
   );
-
-  
-  // const generateUploadUrl = useMutation(api.documents.generateUploadUrl);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -47,22 +41,36 @@ export default function UploadDocumentForm({
     },
   });
 
-  function getLog() {
-    console.log("getDocument");
-  }
+  async function onSubmit(
+    e: React.FormEvent<HTMLFormElement>,
+    values: z.infer<typeof formSchema>
+  ) {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    getLog();
-
-    console.log("onSubmit");
-   await createDocument(values);
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    console.log("await onSubmit");
+    await createDocument(values);
     onUpload();
   }
+
+  function handleSubmit(
+    onSubmit: (
+      e: React.FormEvent<HTMLFormElement>,
+      values: z.infer<typeof formSchema>
+    ) => Promise<void>
+  ) {
+    throw new Error("Function not implemented.");
+  }
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={(e) => {
+          onSubmit(e, form.getValues());
+        }}
         className="space-y-8"
       >
         <FormField
@@ -73,10 +81,13 @@ export default function UploadDocumentForm({
               <FormLabel>Title</FormLabel>
               <FormControl>
                 <Input
-                  placeholder="Expense Report"
+                  placeholder="Document Title"
                   {...field}
                 />
               </FormControl>
+              {/* <FormDescription>
+                This is your public display name.
+              </FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -88,15 +99,17 @@ export default function UploadDocumentForm({
             <FormItem>
               <FormLabel>File</FormLabel>
               <FormControl>
-                <Input
-                  type="file"
-                />
+                <Input type="file" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button type="submit">Upload</Button>
+        <LoadingButton
+          isLoading={isSubmitting}
+          loadingText="Uploading..."
+          children="Upload"
+        />
       </form>
     </Form>
   );
