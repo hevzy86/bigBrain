@@ -81,6 +81,21 @@ export default function UploadDocumentForm({
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="file"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>File</FormLabel>
+              <FormControl>
+                <Input
+                  type="file"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
         <Button type="submit">Upload</Button>
       </form>
     </Form>
