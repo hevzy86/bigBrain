@@ -8,6 +8,8 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Doc } from "@/convex/_generated/dataModel";
+import { Eye } from "lucide-react";
+import Link from "next/link";
 
 import React from "react";
 
@@ -26,11 +28,19 @@ export default function DocumentCard({
         <p>Card Content</p>
       </CardContent>
       <CardFooter>
-        <Button
+        <Button asChild
           variant="secondary"
+          className="flex items-center gap-2" 
         >
-          View Documents
+         <Link href={`/documents/${document._id}`}>
+          <Eye className="w-4 h-4" />
+          View Document
+          </Link>
         </Button>
+
+        {/* <Button>
+          Upload Document
+        </Button> */}
       </CardFooter>
     </Card>
   );

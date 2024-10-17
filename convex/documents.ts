@@ -1,6 +1,12 @@
 import { mutation, query } from "./_generated/server";
 import { ConvexError, v } from "convex/values";
 
+// import { mutation } from "./_generated/server";
+
+export const generateUploadUrl = mutation(async (ctx) => {
+  return await ctx.storage.generateUploadUrl();
+});
+
 export const getDocuments = query({
   handler: async (ctx) => {
     const userID = (await ctx.auth.getUserIdentity())
@@ -20,10 +26,11 @@ export const getDocuments = query({
       .collect();
   },
 });
+export const getDocument = query({
+  args: {
+    documentId: v.id("documents"),
+  },
 
-// Create a new task with the given text
-export const createDocument = mutation({
-  args: { title: v.string() },
   handler: async (ctx, args) => {
     const userID = (await ctx.auth.getUserIdentity())
       ?.tokenIdentifier;
@@ -31,62 +38,35 @@ export const createDocument = mutation({
     // console.log(userID);
 
     if (!userID) {
-      throw new ConvexError("Unauthorized");
+      return [];
     }
-    const newTaskId = await ctx.db.insert("documents", {
-      title: args.title,
-      tokenIdentifier: userID,
-    });
-    return newTaskId;
+    const document = await ctx.db.get(args.documentId);
+
+    if (!document) {
+      return null;
+    }
+
+    if (document?.tokenIdentifier !== userID) {
+      return null;
+    }
+    return {...document, documentUrl:await ctx.storage.getUrl(document.fileId)};
   },
 });
 
+// Create a new task with the given text
+export const createDocument = mutation({
+  args: { title: v.string(), fileId: v.id("_storage") },
+  handler: async (ctx, args) => {
+    const userID = (await ctx.auth.getUserIdentity())
+      ?.tokenIdentifier;
 
-
-
-// export const createDocument = mutation({
-//   args: {
-//     title: v.string(),
-//     fileId: v.id("_storage"),
-//     orgId: v.optional(v.string()),
-//   },
-//   async handler(ctx, args) {
-//     const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
-
-//     if (!userId) {
-//       throw new ConvexError("Not authenticated");
-//     }
-
-//     let documentId: Id<"documents">;
-
-//     if (args.orgId) {
-//       const isMember = await hasOrgAccess(ctx, args.orgId);
-//       if (!isMember) {
-//         throw new ConvexError("You do not have access to this organization");
-//       }
-
-//       documentId = await ctx.db.insert("documents", {
-//         title: args.title,
-//         fileId: args.fileId,
-//         description: "",
-//         orgId: args.orgId,
-//       });
-//     } else {
-//       documentId = await ctx.db.insert("documents", {
-//         title: args.title,
-//         tokenIdentifier: userId,
-//         fileId: args.fileId,
-//         description: "",
-//       });
-//     }
-
-//     await ctx.scheduler.runAfter(
-//       0,
-//       internal.documents.generateDocumentDescription,
-//       {
-//         fileId: args.fileId,
-//         documentId,
-//       }
-//     );
-//   },
-// });
+    if (!userID) {
+      throw new ConvexError("Unauthorized");
+    }
+    await ctx.db.insert("documents", {
+      title: args.title,
+      fileId: args.fileId,
+      tokenIdentifier: userID,
+    });
+  },
+});

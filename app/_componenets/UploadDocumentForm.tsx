@@ -19,9 +19,15 @@ import { useMutation } from "convex/react";
 import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import LoadingButton from "./LoadingButton";
+import { Id } from "@/convex/_generated/dataModel";
 
 const formSchema = z.object({
-  title: z.string().min(1).max(250),
+  // title: z.string().min(1).max(250).nonempty("Title is required"),
+
+  title: z
+    .string()
+    .min(1, "Title is required")
+    .max(250, "Title must be at most 250 characters"),
   file: z.instanceof(File),
 });
 
@@ -34,6 +40,10 @@ export default function UploadDocumentForm({
     api.documents.createDocument
   );
 
+  const generateUploadUrl = useMutation(
+    api.documents.generateUploadUrl
+  );
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,17 +51,30 @@ export default function UploadDocumentForm({
     },
   });
 
-  async function onSubmit(
-    e: React.FormEvent<HTMLFormElement>,
-    values: z.infer<typeof formSchema>
-  ) {
-    e.preventDefault();
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    const url = await generateUploadUrl();
+
+    console.log(url);
+
+    const result = await fetch(url, {
+      method: "POST",
+      headers: { "Content-Type": values.file.type },
+      body: values.file,
+    });
+
+    const { storageId } = await result.json();
+
     setIsSubmitting(true);
 
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    console.log("await onSubmit");
-    await createDocument(values);
+    // await new Promise((resolve) => setTimeout(resolve, 2000));
+    // console.log("Submitting:", values);
+    // console.log("Storageid: " + storageId);
+    await createDocument({
+      title: values.title,
+      fileId: storageId as Id<"_storage">,
+    });
     onUpload();
+    setIsSubmitting(false);
   }
 
   function handleSubmit(
@@ -68,9 +91,7 @@ export default function UploadDocumentForm({
   return (
     <Form {...form}>
       <form
-        onSubmit={(e) => {
-          onSubmit(e, form.getValues());
-        }}
+        onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8"
       >
         <FormField
@@ -85,9 +106,6 @@ export default function UploadDocumentForm({
                   {...field}
                 />
               </FormControl>
-              {/* <FormDescription>
-                This is your public display name.
-              </FormDescription> */}
               <FormMessage />
             </FormItem>
           )}
@@ -95,11 +113,21 @@ export default function UploadDocumentForm({
         <FormField
           control={form.control}
           name="file"
-          render={({ field }) => (
+          render={({
+            field: { value, onChange, ...fieldProps },
+          }) => (
             <FormItem>
               <FormLabel>File</FormLabel>
               <FormControl>
-                <Input type="file" />
+                <Input
+                  {...fieldProps}
+                  type="file"
+                  accept=".txt,.xml,.doc,.docx"
+                  onChange={(ev) => {
+                    const file = ev.target.files?.[0];
+                    onChange(file);
+                  }}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

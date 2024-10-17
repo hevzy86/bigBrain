@@ -32,8 +32,8 @@ export default function UploadDocumentButton() {
   return (
     <Dialog onOpenChange={setIsOpen} open={isOpen}>
       <DialogTrigger asChild>
-        <Button className="">
-          <Upload className="" /> Upload Document
+         <Button className="flex items-center gap-1">
+          <Upload className="w-4 h-4" /> Upload Document
         </Button>
       </DialogTrigger>
       <DialogContent>
