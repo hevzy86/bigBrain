@@ -1,5 +1,11 @@
 "use client";
-
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from "@/components/ui/tabs";
+import ChatPanel from "./ChatPanel";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
 import { api } from "@/convex/_generated/api";
@@ -19,6 +25,8 @@ export default function DocumentPage({
 }: {
   params: { documentId: Id<"documents"> };
 }) {
+
+  // const do1 =  useQuery(api.chats)
   const document = useQuery(api.documents.getDocument, {
     documentId: params.documentId,
   });
@@ -39,15 +47,31 @@ export default function DocumentPage({
           </div> */}
       </div>
       <div className="flex gap-12 ">
-        <div className="bg-gray-800 p-4 rounded flex-1 ">
-          {document.documentUrl && (
-            <iframe src={document.documentUrl} className="h-full"
-           // onLoad={(e) => adjustIframeHeight(e)}
-            />
-            
-          )}
-        </div>
-        <div className="w-[300px] bg-gray-800"></div>
+        <Tabs
+          defaultValue="document"
+          className="w-full"
+        >
+          <TabsList className="mb-2 ">
+            <TabsTrigger value="document">Document</TabsTrigger>
+            <TabsTrigger value="chat">Chat</TabsTrigger>
+          </TabsList>
+          <TabsContent value="document" className="">
+            <div className="bg-gray-800 p-4  flex-1  rounded-xl h-[50vh] ">
+              {document.documentUrl && (
+                <iframe
+                  src={document.documentUrl}
+                  className="h-full w-full"
+                  // onLoad={(e) => adjustIframeHeight(e)}
+                />
+              )}
+            </div>
+          </TabsContent>
+          <TabsContent value="chat">
+            <ChatPanel documentId={document._id} />
+          </TabsContent>
+        </Tabs>
+
+        {/* <div className="w-[300px] bg-gray-800"></div> */}
       </div>
     </main>
   );
