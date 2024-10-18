@@ -108,7 +108,7 @@ export const getDocument = query({
     }
 
     return {
-      ...document,
+      ...accessObj.document,
       documentUrl: await ctx.storage.getUrl(
         accessObj.document.fileId
       ),
@@ -167,7 +167,7 @@ export const askQuestion = action({
     //   throw new ConvexError("File not found");
     // }
     let text_answer = "";
-    if (document && "fileId" in document) {
+    if (accessObj.document && "fileId" in accessObj.document) {
       const file = await ctx.storage.get(
         accessObj.document.fileId
       );

@@ -31,6 +31,8 @@ export default function DocumentPage({
     documentId: params.documentId,
   });
 
+  // const chat = useQuery(api.chats.get())
+
   if (!document)
     return (
       <div className="">

@@ -23,9 +23,8 @@ export default function ChatPanel({
 }: {
   documentId: Id<"documents">;
 }) {
-  const chats = useQuery(
-    api.chats.getChatsForDocument(documentId)
-  );
+  const chats = useQuery(api.chats.getChatsForDocument, { documentId });
+
   const askQuestion = useAction(api.documents.askQuestion);
   return (
     <div className="w-full h-[50vh] bg-gray-800  flex flex-col justify-between gap-2  p-2 space-y-4 ">
@@ -33,20 +32,21 @@ export default function ChatPanel({
         <div className="bg-slate-900 p-2 rounded items-center">
           AI: Ask any question using AI about this document:
         </div>
-        {chats?.map((chat) => {
+        {chats?.map((chat) => (
           <div
+            key={chat._id}
             className={cn(
+              "p-2 rounded",
               {
                 "bg-slate-600": chat.isHuman,
                 "text-right": chat.isHuman,
-              },
-              "p-2 rounded"
+              }
             )}
           >
             {chat.isHuman ? "You: " : "AI: "}
             {chat.text}
-          </div>;
-        })}
+          </div>
+        ))}
       </div>
       <form
         onSubmit={async (event) => {
