@@ -1,6 +1,7 @@
 import { ConvexError, v } from "convex/values";
 import {
   action,
+  internalAction,
   internalMutation,
   internalQuery,
   mutation,
@@ -126,11 +127,21 @@ export const createDocument = mutation({
     if (!userID) {
       throw new ConvexError("Unauthorized");
     }
-    await ctx.db.insert("documents", {
+    const documentId = await ctx.db.insert("documents", {
       title: args.title,
       fileId: args.fileId,
       tokenIdentifier: userID,
+      description: "",
     });
+
+    await ctx.scheduler.runAfter(
+      0,
+      internal.documents.generateDocumentDescription,
+      {
+        fileId: args.fileId,
+        documentId,
+      }
+    );
   },
 });
 
@@ -146,26 +157,12 @@ export const askQuestion = action({
       { documentId: args.documentId }
     );
 
-    // const userID = (await ctx.auth.getUserIdentity())
-    //   ?.tokenIdentifier;
-
-    // if (!userID) {
-    //   throw new ConvexError("Unauthorized");
-    // }
-    // const document = await ctx.runQuery(
-    //   api.documents.getDocument,
-    //   { documentId: args.documentId }
-    // );
-
     if (!accessObj) {
       throw new ConvexError(
         "You o not have access to this document"
       );
     }
-    // const file = await ctx.storage.get(document.fileId);
-    // if (!file) {
-    //   throw new ConvexError("File not found");
-    // }
+
     let text_answer = "";
     if (accessObj.document && "fileId" in accessObj.document) {
       const file = await ctx.storage.get(
@@ -211,13 +208,69 @@ export const askQuestion = action({
       tokenIdentifier: accessObj.userID,
     });
 
-    // const response = chatCompletion.choices[0].message.content;
+    console.log(response);
+    return response;
+  },
+});
 
-    //TODO: store user prompt as a chat record
+export const generateDocumentDescription = internalAction({
+  args: {
+    fileId: v.id("_storage"),
+    documentId: v.id("documents"),
+  },
 
-    //TODO: store AI response as a chat record
+  handler: async (ctx, args) => {
+    const file = await ctx.storage.get(args.fileId);
+
+    if (!file) {
+      throw new ConvexError("File not found");
+    }
+
+    const text = await file?.text();
+
+    const chatCompletion: OpenAI.Chat.Completions.ChatCompletion =
+      await client.chat.completions.create({
+        messages: [
+          {
+            role: "system",
+            content: `Here is a text file: ${text}`,
+          },
+
+          {
+            role: "user",
+            content:
+              "please generate 1 sentence description for this document",
+          },
+        ],
+        model: "gpt-3.5-turbo",
+      });
+
+    const response =
+      chatCompletion.choices[0].message.content ??
+      "Could not figure out the description for this document";
+
+    await ctx.runMutation(
+      internal.documents.updateDocumentDescription,
+      {
+        documentId: args.documentId,
+        description: response,
+      }
+    );
 
     console.log(response);
     return response;
+  },
+});
+
+export const updateDocumentDescription = internalMutation({
+  args: {
+    documentId: v.id("documents"),
+    description: v.string(),
+  },
+
+  async handler(ctx, args) {
+    await ctx.db.patch(args.documentId, {
+      description: args.description,
+    });
   },
 });

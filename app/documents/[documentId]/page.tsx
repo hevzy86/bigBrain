@@ -19,6 +19,7 @@ import {
   useMutation,
   useQuery,
 } from "convex/react";
+import { Spinner } from "@/app/_componenets/Spinner";
 
 export default function DocumentPage({
   params,
@@ -31,12 +32,14 @@ export default function DocumentPage({
     documentId: params.documentId,
   });
 
+  // const document= undefined;
+  
   // const chat = useQuery(api.chats.get())
 
   if (!document)
     return (
       <div className="">
-        You don't have access to this document
+        <Spinner className="h-[50vh]" />
       </div>
     );
 
