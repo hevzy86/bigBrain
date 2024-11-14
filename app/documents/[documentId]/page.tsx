@@ -20,21 +20,17 @@ import {
   useQuery,
 } from "convex/react";
 import { Spinner } from "@/app/_componenets/Spinner";
+import DeleteButton from "@/app/_componenets/DeleteButton";
 
 export default function DocumentPage({
   params,
 }: {
   params: { documentId: Id<"documents"> };
 }) {
-
   // const do1 =  useQuery(api.chats)
   const document = useQuery(api.documents.getDocument, {
     documentId: params.documentId,
   });
-
-  // const document= undefined;
-  
-  // const chat = useQuery(api.chats.get())
 
   if (!document)
     return (
@@ -47,9 +43,7 @@ export default function DocumentPage({
     <main className="p-24 space-y-8">
       <div className="flex justify-between items-center ">
         <h1 className="text-2xl font-bold">{document?.title}</h1>
-        {/* <div className="flex">
-          <iframe src={{document.documentUrl}/>
-          </div> */}
+        <DeleteButton documentId={document._id} />
       </div>
       <div className="flex gap-12 ">
         <Tabs
@@ -60,7 +54,10 @@ export default function DocumentPage({
             <TabsTrigger value="document">Document</TabsTrigger>
             <TabsTrigger value="chat">Chat</TabsTrigger>
           </TabsList>
-          <TabsContent value="document" className="">
+          <TabsContent
+            value="document"
+            className=""
+          >
             <div className="bg-gray-800 p-4  flex-1  rounded-xl h-[50vh] ">
               {document.documentUrl && (
                 <iframe
@@ -76,7 +73,6 @@ export default function DocumentPage({
           </TabsContent>
         </Tabs>
 
-        {/* <div className="w-[300px] bg-gray-800"></div> */}
       </div>
     </main>
   );
