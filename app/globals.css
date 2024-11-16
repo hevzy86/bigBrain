@@ -76,3 +76,8 @@ body {
     @apply bg-background text-foreground;
   }
 }
+
+/* styles/globals.css */
+.nav-link {
+  @apply text-xl hover:text-cyan-100 gap-1 flex-1 flex items-center font-light;
+}

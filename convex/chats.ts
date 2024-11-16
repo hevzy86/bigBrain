@@ -38,10 +38,6 @@
 //   },
 // });
 
-
-
-
-
 // import { v } from "convex/values";
 // import { internalMutation, query } from "./_generated/server";
 
@@ -82,9 +78,6 @@
 //   },
 // });
 
-
-
-
 import { v } from "convex/values";
 import { internalMutation, query } from "./_generated/server";
 
@@ -93,7 +86,8 @@ export const getChatsForDocument = query({
     documentId: v.id("documents"),
   },
   async handler(ctx, args) {
-    const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+    const userId = (await ctx.auth.getUserIdentity())
+      ?.tokenIdentifier;
 
     if (!userId) {
       return [];
@@ -102,7 +96,9 @@ export const getChatsForDocument = query({
     return await ctx.db
       .query("chats")
       .withIndex("by_documentId_tokenIdentifier", (q) =>
-        q.eq("documentId", args.documentId).eq("tokenIdentifier", userId)
+        q
+          .eq("documentId", args.documentId)
+          .eq("tokenIdentifier", userId)
       )
       .collect();
   },

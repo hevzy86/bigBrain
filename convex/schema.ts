@@ -20,4 +20,13 @@ export default defineSchema({
   }).index("by_documentId_token_identifier", [
     "tokenIdentifier",
   ]),
+  notes: defineTable({
+    text: v.string(),
+    tokenIdentifier: v.string(),
+  }).index("by_documentId_token_identifier", [
+    "tokenIdentifier",
+  ])
+
+
+
 });
