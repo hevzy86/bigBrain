@@ -13,6 +13,7 @@ import {
 } from "convex/react";
 import DocumentCard from "@/app/_componenets/DocumentCard";
 import CreateDocumentButton from "@/app/_componenets/CreateDocumentButton";
+import Image from "next/image";
 
 export default function Home() {
   const getDocuments = useQuery(api.documents.getDocuments);
@@ -26,6 +27,18 @@ export default function Home() {
         <h1 className="text-2xl font-bold">My Documents</h1>
         <CreateDocumentButton />
       </div>
+
+      {getDocuments && getDocuments.length === 0 && (
+        <div className="py-12 flex flex-col justify-center items-center gap-8">
+          <Image
+            src="/documents.svg"
+            width={200}
+            height={200}
+            alt="A picture of a girl holding documents"
+          />
+          <h2 className="text-2xl">You have no documents</h2>
+        </div>
+      )}
 
       <div className="grid grid-cols-4 gap-8">
         {getDocuments?.map((document) => (
