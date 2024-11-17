@@ -14,6 +14,61 @@ import OpenAI from "openai";
 import { Id } from "./_generated/dataModel";
 import { access } from "fs";
 
+export const getNotes = query({
+  args: {
+    orgId: v.optional(v.string()),
+  },
+  async handler(ctx, args) {
+    const userId = (await ctx.auth.getUserIdentity())
+      ?.tokenIdentifier;
+
+    if (!userId) {
+      return null;
+    }
+
+    const notes = await ctx.db
+      .query("notes")
+      .withIndex("by_documentId_token_identifier", (q) =>
+        q.eq("tokenIdentifier", userId)
+      )
+      .order("desc")
+      .collect();
+    return notes;
+  },
+});
+
+export const getNote = query({
+    args: {
+      noteId: v.id("notes"),  // Ensure noteId is validated as a valid ID for the 'notes' table
+    },
+    async handler(ctx, args) {
+      try {
+        const userId = (await ctx.auth.getUserIdentity())?.tokenIdentifier;
+  
+        if (!userId) {
+          // Throw a detailed error if user is not found
+          throw new ConvexError("User not found");
+        }
+  
+        // Fetch the note by noteId
+        const note = await ctx.db.get(args.noteId);
+  
+        // Check if the note exists, if not, throw an error
+        if (!note) {
+          throw new ConvexError(`Note with ID ${args.noteId} not found`);
+        }
+  
+        return note;
+      } catch (error) {
+        // Log error details for debugging purposes
+        console.error("Error fetching note:", error);
+  
+        // Return a general error message to the client
+        throw new ConvexError("Internal server error");
+      }
+    },
+  });
+
 export const createNote = mutation({
   args: {
     text: v.string(),
