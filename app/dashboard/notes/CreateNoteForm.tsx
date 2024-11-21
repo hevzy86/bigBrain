@@ -30,7 +30,7 @@ const formSchema = z.object({
   text: z
     .string()
     .min(1, "Title is required")
-    .max(250, "Title must be at most 250 characters"),
+    .max(5000, "Title must be at most 250 characters"),
   // file: z.instanceof(File),
 });
 
@@ -96,7 +96,7 @@ export default function CreateNoteForm({
           )}
         />
 
-      <LoadingButton
+        <LoadingButton
           isLoading={isSubmitting}
           loadingText="Creating..."
         >

@@ -24,7 +24,7 @@ export default function NotePage() {
       <DeleteNoteButton noteId={note._id} />
        
      
-      <div className="p-4">{note?.text}</div>
+      <div className="p-4 whitespace-pre-line">{note?.text}</div>
     </div>
   );
 }

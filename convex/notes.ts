@@ -143,7 +143,6 @@ export const deleteNote = mutation({
 async function embed(text: string) {
   const embedding = await client.embeddings.create({
     model: "text-embedding-ada-002",
-    dimensions: 1536,
     input: text,
   });
   return embedding.data[0].embedding;
