@@ -14,6 +14,10 @@ import OpenAI from "openai";
 import { Id } from "./_generated/dataModel";
 import { access } from "fs";
 
+const client = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY, // This is the default and can be omitted
+});
+
 export const getNotes = query({
   args: {
     orgId: v.optional(v.string()),
@@ -85,11 +89,23 @@ export const createNote = mutation({
       throw new ConvexError("Unauthorized, please login");
     }
 
-    const note = await ctx.db.insert("notes", {
+    // const embedding = await embed(args.text);
+
+    const noteId = await ctx.db.insert("notes", {
       text: args.text,
       tokenIdentifier: userId,
+      // embedding,
     });
-    return note;
+
+    await ctx.scheduler.runAfter(
+      0,
+      internal.notes.createNoteEmbedding,
+      {
+        noteId,
+        text: args.text,
+      }
+    );
+    // return note;
   },
 });
 
@@ -122,5 +138,47 @@ export const deleteNote = mutation({
     // Delete the note
     await ctx.db.delete(args.noteId);
     return note;
+  },
+});
+async function embed(text: string) {
+  const embedding = await client.embeddings.create({
+    model: "text-embedding-ada-002",
+    dimensions: 1536,
+    input: text,
+  });
+  return embedding.data[0].embedding;
+}
+
+export const setNoteEmbedding = internalMutation({
+  args: {
+    noteId: v.id("notes"),
+    embedding: v.array(v.number()),
+  },
+
+  async handler(ctx, args) {
+    // const embedding = await embed(args.text);
+
+    const note = await ctx.db.patch(args.noteId, {
+      embedding: args.embedding,
+    });
+    return note;
+  },
+});
+
+export const createNoteEmbedding = internalAction({
+  args: {
+    noteId: v.id("notes"),
+    text: v.string(),
+  },
+
+  async handler(ctx, args) {
+    const embedding = await embed(args.text);
+
+    await ctx.runMutation(internal.notes.setNoteEmbedding, {
+      noteId: args.noteId,
+      embedding,
+    });
+
+    // return note;
   },
 });

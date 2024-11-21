@@ -27,7 +27,7 @@ const formSchema = z.object({
   title: z
     .string()
     .min(1, "Title is required")
-    .max(250, "Title must be at most 250 characters"),
+    .max(5000, "Title must be at most 250 characters"),
   file: z.instanceof(File),
 });
 
