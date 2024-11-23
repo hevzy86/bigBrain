@@ -140,7 +140,7 @@ export const deleteNote = mutation({
     return note;
   },
 });
-async function embed(text: string) {
+export async function embed(text: string) {
   const embedding = await client.embeddings.create({
     model: "text-embedding-ada-002",
     input: text,

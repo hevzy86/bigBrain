@@ -1,3 +1,4 @@
+import SearchForm from "@/app/_componenets/SearchForm";
 import React from "react";
 
 export default function SettingsPage() {
@@ -6,6 +7,7 @@ export default function SettingsPage() {
       <div className="flex justify-between items-center ">
         <h1 className="text-2xl font-bold">Settings</h1>
       </div>
+      {/* <SearchForm/> */}
     </main>
   );
 }
