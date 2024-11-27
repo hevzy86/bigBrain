@@ -8,7 +8,6 @@ import {
 import ChatPanel from "./ChatPanel";
 import { ModeToggle } from "@/components/mode-toggle";
 import { Button } from "@/components/ui/button";
-import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 // import { createDocument } from "@/convex/documetns";
 import { SignInButton, UserButton } from "@clerk/nextjs";
@@ -21,6 +20,7 @@ import {
 } from "convex/react";
 import { Spinner } from "@/app/_componenets/Spinner";
 import DeleteButton from "@/app/_componenets/DeleteButton";
+import { api } from "@/convex/_generated/api";
 
 export default function DocumentPage({
   params,

@@ -19,9 +19,11 @@ import {
 import { v } from "convex/values";
 
 export default function SearchForm({
-  setNotes,
+  setResults,
 }: {
-  setNotes: (notes: Doc<"notes">[] | null) => void;
+ setResults: (notes: typeof api.search.searchAction._returnType) => void;
+
+
 }) {
   const searchAction = useAction(api.search.searchAction);
   return (
@@ -31,7 +33,7 @@ export default function SearchForm({
         const form = event.target as HTMLFormElement;
         const formData = new FormData(form);
         const text = formData.get("text") as string;
-        await searchAction({ search: text }).then(setNotes);
+        await searchAction({ search: text }).then(setResults);
         form.reset();
       }}
     >

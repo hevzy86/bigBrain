@@ -49,6 +49,7 @@ export default function CreateNoteButton({
           type="submit"
           onClick={(e) => {
             onClick?.(e);
+            console.log("Process");
           }}
         >
           <PlusIcon className="w-4 h-4" /> {children}

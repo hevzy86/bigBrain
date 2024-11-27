@@ -37,7 +37,7 @@ const hasNotes = notes && notes?.length >0 ;
     alt="A picture of a girl holding documents"
   />
   <h2 className="text-2xl">You have no notes</h2>
-  <CreateNoteButton children={"Add a Note"} />
+  {/* <CreateNoteButton children={"Add a Note"} /> */}
   </div>
 </div>
 

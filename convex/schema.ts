@@ -16,10 +16,16 @@ export default defineSchema({
     title: v.string(),
     description: v.optional(v.string()),
     tokenIdentifier: v.string(),
+    embedding: v.optional(v.array(v.float64())),
     fileId: v.id("_storage"),
-  }).index("by_documentId_token_identifier", [
-    "tokenIdentifier",
-  ]),
+  })
+    .index("by_documentId_token_identifier", ["tokenIdentifier"])
+    .vectorIndex("by_embedding", {
+      vectorField: "embedding",
+      dimensions: 1536,
+      filterFields: ["tokenIdentifier"],
+    }),
+
   notes: defineTable({
     text: v.string(),
     embedding: v.optional(v.array(v.float64())),
