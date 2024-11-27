@@ -41,10 +41,12 @@ export const searchAction = action({
     const records: (
       | {
           type: "notes";
+          score: number;
           record: Doc<"notes">;
         }
       | {
           type: "documents";
+          score: number;
           record: Doc<"documents">;
         }
     )[] = [];
@@ -61,6 +63,7 @@ export const searchAction = action({
 
         records.push({
           record: note,
+          score: result._score,
           type: "notes",
         });
       })
@@ -81,10 +84,14 @@ export const searchAction = action({
 
         records.push({
           record: document,
+          score: result._score,
           type: "documents",
         });
       })
     );
+
+    records.sort((a, b) => b.score - a.score);
+
     console.log(records);
     return records;
   },

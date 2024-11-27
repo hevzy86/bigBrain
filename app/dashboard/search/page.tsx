@@ -26,7 +26,7 @@ export default function SettingsPage() {
               >
                 <li key={result.record._id}>
                   <div className=" hover:bg-slate-700 bg-slate-800 rounded p-4 whitespace-pre-line">
-                    type: Note
+                    type: Note {result.score}
                     {result.record.text.substring(0, 500) +
                       "..."}
                   </div>
@@ -41,14 +41,10 @@ export default function SettingsPage() {
               >
                 <li key={result.record._id}>
                   <div className=" hover:bg-slate-700 bg-slate-800 rounded p-4 whitespace-pre-line">
-                    type: Document
+                    type: Document {result.score}
                     {result.record.title.substring(0, 500) +
                       "..."}
-                    {/* {result.record.description.substring( */}
-                    {/* 0,
-                      500
-                    ) + "..."} */}
-                  </div>{" "}
+                  </div>
                 </li>
               </Link>
             );
